@@ -34,6 +34,12 @@ struct {\
 //взять первый элемент из fifo
 #define FIFO_PEEK(fifo) (fifo.buf[fifo.tail & (FIFO_SIZE(fifo)-1)])
 
+//взять последний элемент из fifo (хз сработает или нет)
+#define FIFO_PEEK_LAST(fifo) (fifo.buf[(fifo.head - 1) & (FIFO_SIZE(fifo)-1)])
+
+//удалить последний элемент из fifo
+#define FIFO_REMOVE_LAST(fifo) {if (fifo.tail!=fifo.head) {fifo.head--;}}
+
 //уменьшить количество элементов в очереди
 #define FIFO_POP(fifo)   \
 {\

@@ -15,15 +15,27 @@ responsibility on anything that could happen while using this code.
 #include <stdint.h>
 #include <avr/pgmspace.h>
 
+
 #include "../hardware.h"
+#include "../macros.h"
 
-//#include "cmd_shell.h"
-
-#define baudrate 115200L
-#define bauddivider ((F_CPU + baudrate * 8) / (baudrate * 16) -1)
+#include "../fifo/fifo.h"
+#define _USART_FIFO_ENABLED
+#define _USART_ECHO_ENABLED
 
 //Maximum input text length
 #define MAX_TXT_LEN			64
+
+#if defined(_USART_FIFO_ENABLED)
+FIFO(MAX_TXT_LEN) Tx_buffer;
+FIFO(MAX_TXT_LEN) Rx_buffer;
+#endif // _USART_FIFO_ENABLED
+
+#define BAUD 115200UL
+#define USE_2X 1
+
+
+
 
 //Control characers
 #define CHR_BS				0x08
@@ -31,7 +43,15 @@ responsibility on anything that could happen while using this code.
 #define CHR_LF				0x0A
 
 //UART initialization
-void TIO_Init(void);
+void usart_init(void);
+
+unsigned char usart_rx_interrupt(void)	; // USART_RX_vect
+void usart_tx_interrupt		(void)	; // USART_UDRE_vect
+void usart_check_tx_buffer	(void)	;
+
+void usart_send_string		(char *outtxt)			;
+void usart_send_char		(char ch)				;
+void usart_pgm_send_string	(const uint8_t* pgm_msg);
 
 
 /*
@@ -43,8 +63,8 @@ void TIO_CharOutput(uint8_t ch);
 void TIO_TextOutput(uint8_t *outtxt);
 void TIO_TextInput(uint8_t *intxt);
 //Sends string from FLASH.
-void TIO_PrintPgmMsg(const uint8_t* pgm_msg);
 
 */
+
 
 #endif

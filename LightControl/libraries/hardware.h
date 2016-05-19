@@ -1,9 +1,10 @@
 #ifndef HARDWARE_H_
 #define HARDWARE_H_
 
-#define F_CPU 8000000L
+#define F_CPU 8000000UL
 
 #include "spi/spi.h"
+#include "usart/uart_text_io.h"
 
 //#ifdef SPI_H
 
@@ -17,6 +18,8 @@
 #define _DRIVE_SS
 	
 //#endif
+
+#define USART_BAUDRATE 115200L
 
 //System Timer Config
 #define Prescaler	  		64

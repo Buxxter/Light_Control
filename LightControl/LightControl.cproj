@@ -20,12 +20,12 @@
     <OverrideVtor>false</OverrideVtor>
     <CacheFlash>true</CacheFlash>
     <ProgFlashFromRam>true</ProgFlashFromRam>
-    <RamSnippetAddress />
+    <RamSnippetAddress>0x20000000</RamSnippetAddress>
     <UncachedRange />
     <preserveEEPROM>true</preserveEEPROM>
-    <OverrideVtorValue />
+    <OverrideVtorValue>exception_table</OverrideVtorValue>
     <BootSegment>2</BootSegment>
-    <eraseonlaunchrule>1</eraseonlaunchrule>
+    <eraseonlaunchrule>0</eraseonlaunchrule>
     <AsfFrameworkConfig>
       <framework-data xmlns="">
         <options />
@@ -38,6 +38,34 @@
         </dependencies>
       </framework-data>
     </AsfFrameworkConfig>
+    <avrtool>com.atmel.avrdbg.tool.ispmk2</avrtool>
+    <avrtoolserialnumber>000200212345</avrtoolserialnumber>
+    <avrdeviceexpectedsignature>0x1E9403</avrdeviceexpectedsignature>
+    <com_atmel_avrdbg_tool_simulator>
+      <ToolOptions>
+        <InterfaceProperties>
+        </InterfaceProperties>
+        <InterfaceName>
+        </InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.simulator</ToolType>
+      <ToolNumber>
+      </ToolNumber>
+      <ToolName>Simulator</ToolName>
+    </com_atmel_avrdbg_tool_simulator>
+    <avrtoolinterface>ISP</avrtoolinterface>
+    <avrtoolinterfaceclock>125000</avrtoolinterfaceclock>
+    <com_atmel_avrdbg_tool_ispmk2>
+      <ToolOptions>
+        <InterfaceProperties>
+          <IspClock>125000</IspClock>
+        </InterfaceProperties>
+        <InterfaceName>ISP</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.ispmk2</ToolType>
+      <ToolNumber>000200212345</ToolNumber>
+      <ToolName>AVRISP mkII</ToolName>
+    </com_atmel_avrdbg_tool_ispmk2>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -120,16 +148,37 @@
     <Compile Include="libraries\macros.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="libraries\shell\cmd_func.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libraries\shell\cmd_func.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libraries\shell\cmd_interp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libraries\shell\cmd_interp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libraries\shell\cmd_util.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libraries\shell\cmd_util.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="libraries\spi\spi.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="libraries\spi\spi.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="libraries\uart\uart_text_io.c">
+    <Compile Include="libraries\usart\pgm_strings.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="libraries\uart\uart_text_io.h">
+    <Compile Include="libraries\usart\uart_text_io.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libraries\usart\uart_text_io.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="light\light.c">
@@ -147,12 +196,16 @@
     <Compile Include="rtos\rtos.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="static.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="libraries\" />
     <Folder Include="libraries\fifo\" />
+    <Folder Include="libraries\shell\" />
     <Folder Include="libraries\spi\" />
-    <Folder Include="libraries\uart\" />
+    <Folder Include="libraries\usart" />
     <Folder Include="light" />
     <Folder Include="rtos\" />
   </ItemGroup>

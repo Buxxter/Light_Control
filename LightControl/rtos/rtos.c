@@ -6,8 +6,12 @@ volatile static TPTR	TaskQueue[MAX_TASKS_COUNT+1];			// Pointers Queue
 // MaintTimers Queue
 volatile static struct
 {
-	TPTR GoToTask; 						// Pointer to task
-	uint16_t TimeToStart;				// Time in TimerCycles to run task
+	TPTR		GoToTask;					// Pointer to task
+	uint16_t	TimeToStart;				// Time in TimerCycles to run task
+	#ifdef _ARGS_SUPPORT
+	uint8_t		args[MAX_ARGS_COUNT];
+	bool		withargs;
+	#endif
 } MainTimer[MAX_TIMERS_COUNT+1];
 
 
@@ -74,7 +78,7 @@ void AddTask(TPTR TS)
 
 
 // Adds timer task. Example: SetTimerTask(Task1, Time_In_Intervals_of_TimerService
-void AddTimerTask(TPTR TS, uint8_t NewTime)
+void AddTimerTask(TPTR TS, uint16_t NewTime, bool update_if_exist)
 {
 	if (NewTime == 0)
 	{
@@ -86,15 +90,19 @@ void AddTimerTask(TPTR TS, uint8_t NewTime)
 	
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		// Update TimeToStart if the task already in queue
-		for(index = 0; index != MAX_TIMERS_COUNT + 1; ++index)
+		if (update_if_exist)
 		{
-			if(MainTimer[index].GoToTask == TS)
+			// Update TimeToStart if the task already in queue
+			for(index = 0; index != MAX_TIMERS_COUNT + 1; ++index)
 			{
-				MainTimer[index].TimeToStart	= NewTime - 1;
-				return;
+				if(MainTimer[index].GoToTask == TS)
+				{
+					MainTimer[index].TimeToStart	= NewTime - 1;
+					return;
+				}
 			}
 		}
+		
 	
 		// Add timer if not in queue
 		for(index = 0; index != MAX_TIMERS_COUNT + 1; ++index)	// Find empty timer
