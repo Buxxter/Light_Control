@@ -99,3 +99,9 @@ void light_turn_interval(uint8_t start_bit, uint8_t stop_bit, bool on)
 	AddTimerTask(light_switch_to_next_state, LIGHT_SWITCH_INTERVAL, true);
 	
 }
+
+void light_get_current_state(uint8_t * output)
+{
+	spi_transfer_sync(light_cur_state, output, 2);
+	spi_transmit_sync(output, 2);	
+}
