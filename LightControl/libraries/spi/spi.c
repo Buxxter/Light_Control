@@ -62,7 +62,7 @@ void spi_init()
 	//|   1   |   1   |   1   |   fosc/64     |
 }
 
-void spi_transfer_sync (uint8_t * dataout, uint8_t * datain, uint8_t len)
+void spi_transfer_sync (uint8_t * data_send, uint8_t * data_receive, uint8_t len)
 // Shift full array through target device
 {
 	#ifdef _DRIVE_SS
@@ -71,9 +71,9 @@ void spi_transfer_sync (uint8_t * dataout, uint8_t * datain, uint8_t len)
 		
     uint8_t i;
     for (i = 0; i < len; i++) {
-	    SPDR = dataout[i];
+	    SPDR = data_send[i];
 	    while((SPSR & (1<<SPIF))==0);
-	    datain[i] = SPDR;
+	    data_receive[i] = SPDR;
     }
 	
 	#ifdef _DRIVE_SS
