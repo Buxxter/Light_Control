@@ -1,4 +1,5 @@
 #include "uart_text_io.h"
+#include <util/atomic.h>
 
 void usart_init(void)
 {
@@ -110,6 +111,7 @@ void usart_send_char(char ch)
 			return;
 		}
 		FIFO_PUT(Tx_buffer, ch);
+		UCSRB |= (1<<UDRIE);
 	#else
 		usart_send_char_hard(ch);
 	#endif
@@ -125,28 +127,31 @@ void usart_send_char_hard(char ch)
 
 void usart_pgm_send_string(const uint8_t* pgm_msg)
 {
-	uint16_t	i=0;
-	uint8_t	ch;
-
-	do
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		ch=pgm_read_byte(&(pgm_msg[i]));
-		i++;
+		uint16_t	i=0;
+		uint8_t	ch;
 
-		if (ch)
+		do
 		{
-			//usart_send_char(ch);
-			//usart_check_tx_buffer();
-			usart_send_char_hard(ch);
-		}
+			ch=pgm_read_byte(&(pgm_msg[i]));
+			i++;
+
+			if (ch)
+			{
+				//usart_send_char(ch);
+				//usart_check_tx_buffer();
+				usart_send_char(ch);
+			}
 		
-		//if (FIFO_IS_FULL(Tx_buffer))
-		//{
-			//usart_check_tx_buffer();
-		//}
+			//if (FIFO_IS_FULL(Tx_buffer))
+			//{
+				//usart_check_tx_buffer();
+			//}
 		
 
-	} while (ch!=0);
+		} while (ch!=0);
+	}
 }
 
 

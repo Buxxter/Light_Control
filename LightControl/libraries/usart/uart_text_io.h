@@ -19,12 +19,15 @@ responsibility on anything that could happen while using this code.
 #include "../hardware.h"
 #include "../macros.h"
 
+#include "pgm_strings.h"
+
 #include "../fifo/fifo.h"
 #define _USART_FIFO_ENABLED
 #define _USART_ECHO_ENABLED
 
+
 //Maximum input text length
-#define MAX_TXT_LEN			64
+#define MAX_TXT_LEN			128
 
 #if defined(_USART_FIFO_ENABLED)
 FIFO(MAX_TXT_LEN) Tx_buffer;
