@@ -18,10 +18,11 @@ responsibility on anything that could happen while using this code.
 #include <avr/interrupt.h>
 
 #include "cmd_util.h"
-#include "../usart/uart_text_io.h"
+//#include "../usart/uart_text_io.h"
+#include "../../light/light.h"
 
 //Total functions number
-#define FUNC_NUM        3
+#define FUNC_NUM        4
 
 //Function and command tables
 extern void (*sys_func[FUNC_NUM])(uint8_t* p_arg[],uint8_t num_args);

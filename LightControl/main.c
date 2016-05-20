@@ -3,7 +3,6 @@
 #include <inttypes.h>
 
 #include "includes.h"
-#include "libraries/usart/pgm_strings.h"
 
 #include <util/delay.h>
 #include <avr/wdt.h>
@@ -13,7 +12,7 @@
 #define STATUS_DDR	DDRD
 #define STATUS_PIN	PIND4
 
-void tmp(void);
+void hello_message(void);
 
 void status(void);
 void execute_command(void);
@@ -35,23 +34,8 @@ int main(void)
 	
 	sei();
 	
-	light_turn_interval(11, 2, true);
 	
-	//_delay_ms(2000);
-	
-	light_turn_interval(2, 11, false);
-	
-	light_turn_interval(0, 15, true);
-	
-	light_turn_interval(0, 15, false);
-	
-	//_delay_ms(2000);
-	
-	//light_turn_interval(5, 5, true);
-	
-	
-	
-	AddTimerTask(tmp, 10000, true);
+	AddTimerTask(hello_message, 1000, true);
 	
 	
     /* Replace with your application code */
@@ -67,6 +51,8 @@ int main(void)
 
 void execute_command(void)
 {
+	usart_check_tx_buffer();
+	
 	unsigned char command[FIFO_SIZE(Rx_buffer) + 1];
 	uint8_t index = 0;
 	while(!FIFO_IS_EMPTY(Rx_buffer))
@@ -81,16 +67,9 @@ void execute_command(void)
 	command[index] = '\0';
 	
 	wdt_reset();
-	usart_send_string("\r\n");
-	usart_send_string("|");
-	usart_send_string(command);
-	usart_send_string("|");
-	usart_send_string("\r\n");
-	
-	wdt_reset();
+		
 	uint8_t result = cmd_exec(command);
 	status();
-	
 	
 	usart_pgm_send_string(result ? pgm_ok : pgm_error);
 	
@@ -101,11 +80,9 @@ void status(void)
 	STATUS_PORT ^= (1<<STATUS_PIN);
 }
 
-void tmp(void)
+void hello_message(void)
 {
-	usart_send_string("Another 1 second\r\n");
-	//status();
-	//AddTimerTask(tmp, 1000, true);
+	usart_send_string("\r\nStarted\r\n");
 }
 
 ISR(RTOS_ISR)
@@ -121,6 +98,10 @@ ISR(USART_RXC_vect)
 	
 	if (rx_byte == CHR_ENTER)
 	{
+		#ifdef _USART_ECHO_ENABLED
+		usart_send_char('\n');
+		#endif
+		
 		AddTask(execute_command);
 	}
 	

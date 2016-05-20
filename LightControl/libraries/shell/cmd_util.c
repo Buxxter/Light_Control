@@ -1,4 +1,5 @@
 #include "cmd_util.h"
+#include <stdbool.h>
 
 /*Code module from AVR command shell project.
 See appropriate header file for detais.*/
@@ -72,4 +73,35 @@ uint16_t str_to_uint16(uint8_t *s_num)
     }
 
     return r_val;
+}
+
+uint8_t str_to_uint8(uint8_t *s_num)
+{
+	uint8_t i=0,dgt_len=0;
+	uint8_t r_val=0,mult=1;
+
+	while (is_digit(s_num[dgt_len]))
+	dgt_len++;
+
+	for (i=dgt_len; i>0; i--)
+	{
+		r_val += (s_num[i-1]-'0') * mult;
+		mult *= 10;
+	}
+
+	return r_val;
+}
+
+bool str_is_number(uint8_t *str)
+{
+	uint8_t i = 0;
+	while (str[i] != '\0')
+	{
+		if (!(is_digit(str[i++])))
+		{
+			return false;
+		}
+	}
+	
+	return true;	
 }

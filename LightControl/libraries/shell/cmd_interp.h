@@ -13,8 +13,6 @@ responsibility on anything that could happen while using this code.
 
 #include <stdint.h>
 
-#include "../usart/uart_text_io.h"
-
 #include "cmd_func.h"
 #include "cmd_util.h"
 #include "cmd_shell.h"

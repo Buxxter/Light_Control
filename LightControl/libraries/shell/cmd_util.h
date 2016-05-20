@@ -12,6 +12,7 @@ responsibility on anything that could happen while using this code.
 */
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <avr/pgmspace.h>
 
 //Returns 1 if supplied character is letter or digit.
@@ -29,5 +30,8 @@ uint8_t str_equal_pgm(uint8_t* str, uint8_t const *pgm_str);
 //NO ERROR HANDLING, so, say, 70000 will be succesfully 
 //converted, but, of course, to incorrect value.
 uint16_t str_to_uint16(uint8_t *s_num);
+uint8_t str_to_uint8(uint8_t *s_num);
+
+bool str_is_number(uint8_t *str);
 
 #endif
