@@ -22,7 +22,7 @@ responsibility on anything that could happen while using this code.
 #include "../../light/light.h"
 
 //Total functions number
-#define FUNC_NUM        4
+#define FUNC_NUM        5
 
 //Function and command tables
 extern void (*sys_func[FUNC_NUM])(uint8_t* p_arg[],uint8_t num_args);

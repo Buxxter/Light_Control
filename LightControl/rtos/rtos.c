@@ -76,6 +76,10 @@ void AddTask(TPTR TS)
 	
 }
 
+//void AddTimerTask(TPTR TS, uint16_t NewTime, bool update_if_exist)
+//{
+	//AddTimerHardTask(TS, NewTime * 2, update_if_exist);
+//}
 
 // Adds timer task. Example: SetTimerTask(Task1, Time_In_Intervals_of_TimerService
 void AddTimerTask(TPTR TS, uint16_t NewTime, bool update_if_exist)

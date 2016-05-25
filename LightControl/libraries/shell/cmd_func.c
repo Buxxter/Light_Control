@@ -185,6 +185,23 @@ void light(uint8_t * p_arg[], uint8_t num_args)
 	
 }
 
+void dimmer(uint8_t * p_arg[], uint8_t num_args)
+{
+	if (num_args == 0)
+	{
+		usart_pgm_send_string(light_help);
+	} else
+	if (num_args == 1)
+	{
+		uint8_t new_val = str_to_uint8(p_arg[0]);
+		light_dimmer_change_value(new_val);
+	} else
+	{
+		usart_pgm_send_string(msg_err_unknown);
+		usart_send_string((char*)p_arg[0]);
+		new_line;
+	}
+}
 //Function table
 
 void (*sys_func[]) (uint8_t* p_arg[],uint8_t num_args) = {
@@ -192,7 +209,8 @@ void (*sys_func[]) (uint8_t* p_arg[],uint8_t num_args) = {
     print_help,
     list_args,
 	handle_led,
-	light
+	light,
+	dimmer
 
 };
 
@@ -202,11 +220,13 @@ const uint8_t funcname1[] PROGMEM = {"help"};
 const uint8_t funcname2[] PROGMEM = {"listarg"};
 const uint8_t funcname3[] PROGMEM = {"led"};
 const uint8_t funcname4[] PROGMEM = {"light"};
+const uint8_t funcname5[] PROGMEM = {"dimmer"};
 
 const uint8_t * const sys_func_names[] PROGMEM = {
 
     funcname1,
     funcname2,
 	funcname3,
-	funcname4
+	funcname4,
+	funcname5
 };

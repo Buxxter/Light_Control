@@ -57,6 +57,13 @@ void usart_send_char		(char ch)				;
 void usart_pgm_send_string	(const uint8_t* pgm_msg);
 
 
+#define usart_send_bin(bin_value) { \
+	char tmp_string_bin[16]; \
+	itoa(bin_value, tmp_string_bin, 2); \
+	usart_send_string(tmp_string_bin); \
+	usart_send_string("\r\n"); \
+}
+
 /*
 
 //Char I/O

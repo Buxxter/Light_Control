@@ -7,6 +7,7 @@
 #include <util/delay.h>
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
+#include <stdlib.h>
 
 #define STATUS_PORT PORTD
 #define STATUS_DDR	DDRD
@@ -30,12 +31,23 @@ int main(void)
 	light_init();
 	usart_init();
 	
-	rtos_init();
 	
+	
+	
+	rtos_init();
+	//AddTask(hello_message);
+	hello_message();
+	
+	bt_init();
+	
+	#ifdef LIGHT_DEBUG
+	reset_zerocross_counter();
+	#endif
+		
 	sei();
 	
+	bt_scan();
 	
-	AddTimerTask(hello_message, 1000, true);
 	
 	
     /* Replace with your application code */
@@ -44,6 +56,16 @@ int main(void)
 		wdt_reset();
 		TaskManager();
 		usart_check_tx_buffer();
+		
+		#ifdef DEBUG
+		if (PIND & (1<<PIND7))
+		{
+			STATUS_PORT |= (1<<STATUS_PIN);
+		} else {
+			STATUS_PORT &= ~(1<<STATUS_PIN);
+		}
+#endif // DEBUG
+		
     }
 	
 	return 0;
@@ -69,7 +91,6 @@ void execute_command(void)
 	wdt_reset();
 		
 	uint8_t result = cmd_exec(command);
-	status();
 	
 	usart_pgm_send_string(result ? pgm_ok : pgm_error);
 	
@@ -83,6 +104,10 @@ void status(void)
 void hello_message(void)
 {
 	usart_send_string("\r\nStarted\r\n");
+	//char tmp_string[64];
+	//itoa(*PORTD, tmp_string, 16);
+	//usart_send_string(tmp_string);
+	usart_send_string("\r\n");
 }
 
 ISR(RTOS_ISR)
@@ -110,4 +135,17 @@ ISR(USART_RXC_vect)
 ISR(USART_UDRE_vect)
 {
 	usart_tx_interrupt();
+}
+
+uint8_t bin_zc = 0;
+
+ISR(INT1_vect)
+{
+	
+	light_dimmer_isr();
+	
+	#ifdef DEBUG
+	//usart_send_string("INT1\r\n");
+	status();
+	#endif
 }

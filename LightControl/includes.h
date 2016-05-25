@@ -8,6 +8,7 @@
 #include "light/light.h"
 
 #include "libraries/shell/cmd_interp.h"
+#include "libraries/button/button.h"
 
 #include "static.h"
 
