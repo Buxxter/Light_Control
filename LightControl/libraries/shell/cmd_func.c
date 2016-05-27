@@ -135,16 +135,10 @@ void light(uint8_t * p_arg[], uint8_t num_args)
 		} else
 		if (str_equal_pgm(p_arg[0], msg_bin))
 		{
-			uint8_t light_state[2];
-			light_get_current_state(light_state);
 			char light_string[17];
-			for (uint8_t i = 0; i < 8; i++)
+			for (uint8_t i = 0; i < 16; i++)
 			{
-				light_string[i] = '0' + ((light_state[0] & (1<<i)) != 0);
-			}
-			for (uint8_t i = 0; i < 8; i++)
-			{
-				light_string[8+i] = '0' + ((light_state[1] & (1<<i)) != 0);
+				light_string[i] = '0' + ((light_cur_state.all & (1<<i)) != 0);
 			}
 			light_string[16] = '\0';
 			usart_send_string(light_string);

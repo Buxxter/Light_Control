@@ -145,6 +145,12 @@
     <Compile Include="libraries\button\button.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="libraries\button\button_functions.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libraries\button\button_functions.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="libraries\button\button_local.h">
       <SubType>compile</SubType>
     </Compile>

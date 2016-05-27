@@ -58,7 +58,7 @@ int main(void)
 		usart_check_tx_buffer();
 		
 		#ifdef DEBUG
-		if (PIND & (1<<PIND7))
+		if (PINC & (1<<PINC2))
 		{
 			STATUS_PORT |= (1<<STATUS_PIN);
 		} else {
