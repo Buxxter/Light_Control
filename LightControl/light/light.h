@@ -22,7 +22,16 @@
 
 #define _DIMMER_ENABLED
 
-
+union
+{
+	uint16_t all;
+	uint8_t byte[2];
+	struct
+	{
+		uint8_t byte_l;
+		uint8_t byte_h;
+	};
+} light_cur_state;
 
 
 void light_init(void);

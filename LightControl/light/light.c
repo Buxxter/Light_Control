@@ -7,9 +7,12 @@
 
 //#define LIGHT_DEBUG
 
-uint8_t		light_cur_state[2];
-#define		light_cur_state_l	(light_cur_state[0])
-#define		light_cur_state_h	(light_cur_state[1])
+
+
+//uint8_t		light_cur_state[2];
+
+//#define		light_cur_state_l	(light_cur_state[0])
+//#define		light_cur_state_h	(light_cur_state[1])
 
 FIFO(64)	light_lstate_queue;
 FIFO(64)	light_hstate_queue;
@@ -33,8 +36,10 @@ void light_dimmer_signal_off(void);
 
 void light_init(void)
 {
-	light_cur_state_l = 0;
-	light_cur_state_h = 0;
+	//light_cur_state_l = 0;
+	//light_cur_state_h = 0;
+	light_cur_state.all = 0;
+	
 	light_dimmer_current_value	= 0;
 	light_dimmer_point_value	= 0;
 	light_update_state();
@@ -71,7 +76,7 @@ void light_dimmer_init(void)
 void light_update_state(void)
 {
 	
-	spi_transmit_sync(light_cur_state, 2);
+	spi_transmit_sync(light_cur_state.byte, 2);
 	
 	//AddTimerTask(light_move, SWITCH_INTERVAL, false);	
 	
@@ -84,8 +89,8 @@ void light_switch_to_next_state(void)
 		return;
 	}
 	
-	light_cur_state_l = FIFO_GET(light_lstate_queue);
-	light_cur_state_h = FIFO_GET(light_hstate_queue);
+	light_cur_state.byte_l = FIFO_GET(light_lstate_queue);
+	light_cur_state.byte_h = FIFO_GET(light_hstate_queue);
 	
 	light_update_state();
 	
@@ -98,8 +103,8 @@ void light_switch_to_next_state(void)
 
 void light_add_state_to_queue(uint8_t lamp_number, bool on)
 {
-	uint8_t val_L = LIGHT_QUEUE_IS_EMPTY ? light_cur_state_l : FIFO_PEEK_LAST(light_lstate_queue);
-	uint8_t val_H = LIGHT_QUEUE_IS_EMPTY ? light_cur_state_h : FIFO_PEEK_LAST(light_hstate_queue);
+	uint8_t val_L = LIGHT_QUEUE_IS_EMPTY ? light_cur_state.byte_l : FIFO_PEEK_LAST(light_lstate_queue);
+	uint8_t val_H = LIGHT_QUEUE_IS_EMPTY ? light_cur_state.byte_h : FIFO_PEEK_LAST(light_hstate_queue);
 	
 	if (on)
 	{
@@ -147,8 +152,10 @@ void light_turn_interval(uint8_t start_bit, uint8_t stop_bit, bool on)
 
 void light_get_current_state(uint8_t * output)
 {
-	spi_transfer_sync(light_cur_state, output, 2);
-	spi_transmit_sync(output, 2);	
+	//spi_transfer_sync(light_cur_state.byte, output, 2);
+	//spi_transmit_sync(output, 2);
+	output = light_cur_state.byte;
+	
 }
 
 void light_update_dimmer_state(void)
