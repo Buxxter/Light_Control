@@ -60,7 +60,7 @@ void bt_init(void)
 	init_button(&buttons[0], &PIND, PIND7, 1, 3);
 	init_button(&buttons[1], &PINC, PINC6, 1, 3);
 	init_button(&buttons[2], &PINC, PINC7, 1, 2);
-	init_button(&buttons[3], &PINA, PINA7, 1, 3);
+	init_button(&buttons[3], &PINA, PINA7, 1, 2);
 	
 	#if defined(BUTTON_DEBUG)
 	dbg_msg(&buttons[0], "init");

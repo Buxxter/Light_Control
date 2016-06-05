@@ -40,9 +40,13 @@ void light_init(void)
 	//light_cur_state_h = 0;
 	light_cur_state.all = 0;
 	
+	FIFO_FLUSH(light_lstate_queue);
+	FIFO_FLUSH(light_hstate_queue);
+	
 	light_dimmer_current_value	= 0;
 	light_dimmer_point_value	= 0;
 	light_update_state();
+	
 	
 	#ifdef _DIMMER_ENABLED
 	light_dimmer_init();

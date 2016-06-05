@@ -34,7 +34,7 @@ struct {\
 //взять первый элемент из fifo
 #define FIFO_PEEK(fifo) (fifo.buf[fifo.tail & (FIFO_SIZE(fifo)-1)])
 
-//взять последний элемент из fifo (хз сработает или нет)
+//взять последний элемент из fifo
 #define FIFO_PEEK_LAST(fifo) (fifo.buf[(fifo.head - 1) & (FIFO_SIZE(fifo)-1)])
 
 //удалить последний элемент из fifo

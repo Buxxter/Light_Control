@@ -146,6 +146,6 @@ ISR(INT1_vect)
 	
 	#ifdef DEBUG
 	//usart_send_string("INT1\r\n");
-	status();
+	//status();
 	#endif
 }
