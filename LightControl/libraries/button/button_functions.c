@@ -42,10 +42,10 @@ void turn(uint8_t self_start, uint8_t self_stop, bool all);
 
 void turn(uint8_t self_start, uint8_t self_stop, bool all)
 {
-	usart_send_string("turn\r\n");
 	if (all)
 	{
-		light_turn_interval(0, 15, (light_cur_state.all == 0));
+		//light_turn_interval(0, 15, (light_cur_state.all == 0));
+		light_turn_all(self_start, (light_cur_state.all == 0));
 		return;
 	}
 		
@@ -66,7 +66,7 @@ void further_bed_switch(button *btn)
 	
 	if (btn->state.longs_count == 1)
 	{
-		turn(0, 0, true);
+		turn(btn->state.shorts_count, 0, true);
 		bt_reset(btn);
 		return;
 	}
@@ -93,7 +93,7 @@ void central_bed_switch(button *btn)
 	
 	if (btn->state.longs_count == 1)
 	{
-		turn(0, 0, true);
+		turn(btn->state.shorts_count, 0, true);
 		bt_reset(btn);
 		return;
 	}
@@ -120,7 +120,7 @@ void comp_switch(button *btn)
 	
 	if (btn->state.longs_count == 1)
 	{
-		turn(0, 0, true);
+		turn(btn->state.shorts_count, 0, true);
 		bt_reset(btn);
 		return;
 	}
@@ -146,7 +146,7 @@ void erker_switch(button *btn)
 	
 	if (btn->state.longs_count == 1)
 	{
-		turn(0, 0, true);
+		turn(btn->state.shorts_count, 0, true);
 		return;
 	}
 	

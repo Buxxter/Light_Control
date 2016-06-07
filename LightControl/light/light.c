@@ -1,6 +1,7 @@
 
 #include "light.h"
 #include "../libraries/fifo/fifo.h"
+#include "../libraries/fifo/fifo16.h"
 
 #include <inttypes.h>
 #include <stdlib.h>
@@ -14,14 +15,17 @@
 //#define		light_cur_state_l	(light_cur_state[0])
 //#define		light_cur_state_h	(light_cur_state[1])
 
-FIFO(64)	light_lstate_queue;
-FIFO(64)	light_hstate_queue;
-#define		LIGHT_QUEUE_IS_EMPTY	(FIFO_IS_EMPTY(light_lstate_queue))
+//FIFO(64)	light_lstate_queue;
+//FIFO(64)	light_hstate_queue;
+FIFO16(64)	light_state_queue;
+
+#define		LIGHT_QUEUE_IS_EMPTY	(FIFO16_IS_EMPTY(light_state_queue))
 
 uint16_t zerocross_counter = 0;
 
 uint8_t		light_dimmer_current_value;
 uint8_t		light_dimmer_point_value;
+uint8_t		light_dimmer_saved_value;
 
 #ifndef _LOCAL_FUNCTIONS
 
@@ -29,7 +33,6 @@ void light_dimmer_init(void);
 void light_update_state(void);
 void light_switch_to_next_state(void);
 void light_dimmer_signal_off(void);
-
 
 #endif
 
@@ -40,8 +43,10 @@ void light_init(void)
 	//light_cur_state_h = 0;
 	light_cur_state.all = 0;
 	
-	FIFO_FLUSH(light_lstate_queue);
-	FIFO_FLUSH(light_hstate_queue);
+	//FIFO_FLUSH(light_lstate_queue);
+	//FIFO_FLUSH(light_hstate_queue);
+	
+	FIFO16_FLUSH(light_state_queue);
 	
 	light_dimmer_current_value	= 0;
 	light_dimmer_point_value	= 0;
@@ -92,9 +97,10 @@ void light_switch_to_next_state(void)
 	{
 		return;
 	}
-	
-	light_cur_state.byte_l = FIFO_GET(light_lstate_queue);
-	light_cur_state.byte_h = FIFO_GET(light_hstate_queue);
+		
+	//light_cur_state.byte_l = FIFO_GET(light_lstate_queue);
+	//light_cur_state.byte_h = FIFO_GET(light_hstate_queue);
+	light_cur_state.all = FIFO16_GET(light_state_queue);
 	
 	light_update_state();
 	
@@ -107,30 +113,47 @@ void light_switch_to_next_state(void)
 
 void light_add_state_to_queue(uint8_t lamp_number, bool on)
 {
-	uint8_t val_L = LIGHT_QUEUE_IS_EMPTY ? light_cur_state.byte_l : FIFO_PEEK_LAST(light_lstate_queue);
-	uint8_t val_H = LIGHT_QUEUE_IS_EMPTY ? light_cur_state.byte_h : FIFO_PEEK_LAST(light_hstate_queue);
+	//uint8_t val_L = LIGHT_QUEUE_IS_EMPTY ? light_cur_state.byte_l : FIFO_PEEK_LAST(light_lstate_queue);
+	//uint8_t val_H = LIGHT_QUEUE_IS_EMPTY ? light_cur_state.byte_h : FIFO_PEEK_LAST(light_hstate_queue);
+	uint16_t last_val = LIGHT_QUEUE_IS_EMPTY ? light_cur_state.all : FIFO16_PEEK_LAST(light_state_queue);
+		
+	//if (on)
+	//{
+		//if (lamp_number < 8)
+		//{
+			//sbit(val_L, lamp_number);
+		//} else if (lamp_number < 16)
+		//{
+			//sbit(val_H, (lamp_number - 8));
+		//}
+	//} else {
+		//if (lamp_number < 8)
+		//{
+			//cbit(val_L, lamp_number);
+		//} else if (lamp_number < 16)
+		//{
+			//cbit(val_H, (lamp_number - 8));
+		//}
+	//}
+	
+	//FIFO_PUT(light_lstate_queue, val_L);
+	//FIFO_PUT(light_hstate_queue, val_H);
+	
+	if (lamp_number >= LIGHT_MAIN_LAMPS_COUNT)
+	{
+		return;
+	}
 	
 	if (on)
 	{
-		if (lamp_number < 8)
-		{
-			sbit(val_L, lamp_number);
-		} else if (lamp_number < 16)
-		{
-			sbit(val_H, (lamp_number - 8));
-		}
-	} else {
-		if (lamp_number < 8)
-		{
-			cbit(val_L, lamp_number);
-		} else if (lamp_number < 16)
-		{
-			cbit(val_H, (lamp_number - 8));
-		}
+		sbit(last_val, lamp_number);
 	}
-	
-	FIFO_PUT(light_lstate_queue, val_L);
-	FIFO_PUT(light_hstate_queue, val_H);
+	else
+	{
+		cbit(last_val, lamp_number);
+	}
+	FIFO16_PUT(light_state_queue, last_val);
+		
 		
 }
 
@@ -162,6 +185,46 @@ void light_get_current_state(uint8_t * output)
 	
 }
 
+void light_turn_all(uint8_t mode, bool on)
+{
+	if(!on)
+	{
+		light_turn_interval(0, LIGHT_MAIN_LAMPS_COUNT - 1, false);
+		#if(_DIMMER_ENABLED)
+		light_dimmer_change_value(0);
+		#endif
+		return;
+	}
+	
+	uint8_t iter;
+	uint8_t step;
+	
+	switch(mode)
+	{
+		case 1:
+			iter = 1;
+			step = 2;
+			break;
+		case 2:
+			iter = 0;
+			step = 1;
+			break;
+		default:
+			iter = 2;
+			step = 6;
+			break;
+	}
+	
+	while(iter < LIGHT_MAIN_LAMPS_COUNT)
+	{
+		light_add_state_to_queue(iter, on);
+		iter = iter + step;
+	}
+	
+	light_switch_to_next_state();
+	
+}
+
 void light_update_dimmer_state(void)
 {
 	if (light_dimmer_current_value == light_dimmer_point_value)
@@ -190,6 +253,8 @@ void light_dimmer_change_value(uint8_t new_value)
 	{ 
 		new_value = 100;
 	}
+	
+	light_dimmer_saved_value = light_dimmer_current_value;
 	
 	light_dimmer_point_value = new_value;
 	light_update_dimmer_state();
