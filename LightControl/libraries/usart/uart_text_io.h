@@ -23,7 +23,8 @@ responsibility on anything that could happen while using this code.
 
 #include "../fifo/fifo.h"
 #define _USART_FIFO_ENABLED
-#define _USART_ECHO_ENABLED
+//#define _USART_ECHO_ENABLED
+extern uint8_t echo_en;
 
 
 //Maximum input text length

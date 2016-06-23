@@ -1,6 +1,8 @@
 #include "uart_text_io.h"
 #include <util/atomic.h>
 
+uint8_t echo_en = 1;
+
 void usart_init(void)
 {
 	/* Set baud rate */
@@ -52,11 +54,16 @@ unsigned char usart_rx_interrupt (void) // USART_RX_vect
 {
 	unsigned char rx_byte = UDR;
 	#if defined(_USART_FIFO_ENABLED)
-		#if defined(_USART_ECHO_ENABLED)
-			// echo
-			//FIFO_PUT(Tx_buffer, rx_byte);
+		
+		//#if defined(_USART_ECHO_ENABLED)
+		//	usart_send_char(rx_byte);			
+		//#endif
+		
+		if (echo_en)
+		{
 			usart_send_char(rx_byte);
-		#endif
+		}
+		
 		if (rx_byte == CHR_BS)
 		{
 			FIFO_REMOVE_LAST(Rx_buffer);
