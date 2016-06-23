@@ -170,9 +170,9 @@ void (*button_func[]) (button *btn) = {
 void send_button_state(button *btn, char *btn_name)
 {
 	usart_send_string(btn_name);
-	usart_send_char('(');
+	usart_send_char(',');
 	usart_send_char('0' + btn->state.longs_count);
 	usart_send_char(',');
 	usart_send_char('0' + btn->state.shorts_count);
-	usart_send_string(")\r\n");
+	usart_send_string("\r\n");
 }

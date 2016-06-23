@@ -57,10 +57,10 @@ void bt_init(void)
 	//DDRC &= ~((1<<PINC2) | (1<<PINC3) | (1<<PINC4));
 	//PORTC |= ((1<<PINC2) | (1<<PINC3) | (1<<PINC4));
 	
-	init_button(&buttons[0], &PIND, PIND7, 1, 3);
-	init_button(&buttons[1], &PINC, PINC6, 1, 3);
-	init_button(&buttons[2], &PINC, PINC7, 1, 2);
-	init_button(&buttons[3], &PINA, PINA7, 1, 2);
+	init_button(&buttons[0], &PINA, PINA0, 1, 3);
+	init_button(&buttons[1], &PINA, PINC1, 1, 3);
+	init_button(&buttons[2], &PINA, PINC2, 1, 2);
+	init_button(&buttons[3], &PINA, PINA3, 1, 2);
 	
 	#if defined(BUTTON_DEBUG)
 	dbg_msg(&buttons[0], "init");
