@@ -196,6 +196,34 @@ void dimmer(uint8_t * p_arg[], uint8_t num_args)
 		new_line;
 	}
 }
+
+
+void boot(uint8_t * p_arg[], uint8_t num_args)
+{
+	wdt_enable(WDTO_15MS);
+	while(1);
+	
+}
+
+void echo(uint8_t * p_arg[], uint8_t num_args)
+{
+	if (num_args == 0)
+	{
+		usart_pgm_send_string(echo_en ? cmd_on : cmd_off);
+		new_line;
+	} else
+	if (num_args == 1)
+	{
+		echo_en = str_equal_pgm(p_arg[0], cmd_on);
+	} else
+	{
+		usart_pgm_send_string(msg_err_unknown);
+		usart_send_string((char*)p_arg[0]);
+		new_line;
+	}
+	
+}
+
 //Function table
 
 void (*sys_func[]) (uint8_t* p_arg[],uint8_t num_args) = {
@@ -204,7 +232,9 @@ void (*sys_func[]) (uint8_t* p_arg[],uint8_t num_args) = {
     list_args,
 	handle_led,
 	light,
-	dimmer
+	dimmer,
+	boot,
+	echo
 
 };
 
@@ -215,6 +245,8 @@ const uint8_t funcname2[] PROGMEM = {"listarg"};
 const uint8_t funcname3[] PROGMEM = {"led"};
 const uint8_t funcname4[] PROGMEM = {"light"};
 const uint8_t funcname5[] PROGMEM = {"dimmer"};
+const uint8_t funcname6[] PROGMEM = {"boot"};
+const uint8_t funcname7[] PROGMEM = {"echo"};
 
 const uint8_t * const sys_func_names[] PROGMEM = {
 
@@ -222,5 +254,7 @@ const uint8_t * const sys_func_names[] PROGMEM = {
     funcname2,
 	funcname3,
 	funcname4,
-	funcname5
+	funcname5,
+	funcname6,
+	funcname7
 };

@@ -82,9 +82,9 @@ void AddTask(TPTR TS)
 //}
 
 // Adds timer task. Example: SetTimerTask(Task1, Time_In_Intervals_of_TimerService
-void AddTimerTask(TPTR TS, uint16_t NewTime, bool update_if_exist)
+void AddTimerTask(TPTR TS, uint16_t NewTime_ms, bool update_if_exist)
 {
-	if (NewTime == 0)
+	if (NewTime_ms == 0)
 	{
 		AddTask(TS);
 		return;
@@ -101,7 +101,7 @@ void AddTimerTask(TPTR TS, uint16_t NewTime, bool update_if_exist)
 			{
 				if(MainTimer[index].GoToTask == TS)
 				{
-					MainTimer[index].TimeToStart	= NewTime - 1;
+					MainTimer[index].TimeToStart	= NewTime_ms - 1;
 					return;
 				}
 			}
@@ -114,7 +114,7 @@ void AddTimerTask(TPTR TS, uint16_t NewTime, bool update_if_exist)
 			if (MainTimer[index].GoToTask == Idle)
 			{
 				MainTimer[index].GoToTask		= TS;
-				MainTimer[index].TimeToStart	= NewTime - 1;
+				MainTimer[index].TimeToStart	= NewTime_ms - 1;
 				return;
 			}
 		

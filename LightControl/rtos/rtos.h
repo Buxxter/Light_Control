@@ -23,7 +23,7 @@ extern void rtos_timer_setup (void);
 
 extern void AddTask(TPTR TS);
 extern void AddTimerHardTask(TPTR TS, uint16_t NewTime, bool update_if_exist);
-extern void AddTimerTask(TPTR TS, uint16_t NewTime, bool update_if_exist);
+extern void AddTimerTask(TPTR TS, uint16_t NewTime_ms, bool update_if_exist);
 
 extern void TaskManager(void);
 extern void TimerService(void);
