@@ -100,6 +100,24 @@ void spi_transmit_sync (uint8_t * dataout, uint8_t len)
 	#endif
 }
 
+void spi_transmit_sync_inverted (uint8_t * dataout, uint8_t len)
+// Shift full array to target device without receiving any byte
+{
+	#ifdef _DRIVE_SS
+	cbit(SPI_PORT, SPI_SS);
+	#endif
+	
+	uint8_t i;
+	for (i = 0; i < len; i++) {
+		SPDR = ~dataout[i];
+		while((SPSR & (1<<SPIF))==0);
+	}
+	
+	#ifdef _DRIVE_SS
+	sbit(SPI_PORT, SPI_SS);
+	#endif
+}
+
 uint8_t spi_fast_shift (uint8_t data)
 // Clocks only one byte to target device and returns the received one
 {
