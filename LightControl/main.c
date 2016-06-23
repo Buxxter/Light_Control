@@ -11,64 +11,63 @@
 
 #define STATUS_PORT PORTD
 #define STATUS_DDR	DDRD
-#define STATUS_PIN	PIND4
+#define STATUS_PIN	PIND6
 
+void init(void);
+void wdt_init(void);
 void hello_message(void);
-
 void status(void);
 void execute_command(void);
 
 int main(void)
 {
 	
-	STATUS_DDR |= (1<<STATUS_PIN);
+	init();
 	
-	//clock_prescale_set()
+	status();
 	
-	spi_init();
-	spi_transmit_sync(0, 1);
-	spi_transmit_sync(0, 1);
-	light_init();
-	usart_init();
-	
-	
-	
-	
-	rtos_init();
-	//AddTask(hello_message);
-	hello_message();
-	
-	bt_init();
-	
-	#ifdef LIGHT_DEBUG
-	reset_zerocross_counter();
-	#endif
-		
 	sei();
 	
 	bt_scan();
 	
-	
-	
-    /* Replace with your application code */
+
     while (1) 
     {
 		wdt_reset();
 		TaskManager();
 		usart_check_tx_buffer();
 		
-		#ifdef DEBUG
-		if (PINC & (1<<PINC2))
-		{
-			STATUS_PORT |= (1<<STATUS_PIN);
-		} else {
-			STATUS_PORT &= ~(1<<STATUS_PIN);
-		}
-#endif // DEBUG
-		
     }
 	
 	return 0;
+}
+
+void init(void)
+{
+	STATUS_DDR |= (1<<STATUS_PIN);
+		
+	spi_init();
+	spi_transmit_sync(0, 1);
+	spi_transmit_sync(0, 1);
+	
+	#ifdef LIGHT_DEBUG
+	reset_zerocross_counter();
+	#endif
+	
+	light_init();
+	usart_init();
+	rtos_init();
+	hello_message();
+	
+	bt_init();
+	
+	wdt_init();
+}
+
+void wdt_init(void)
+{
+	wdt_enable(WDTO_2S);
+	return;
 }
 
 void execute_command(void)
@@ -99,14 +98,12 @@ void execute_command(void)
 void status(void)
 {
 	STATUS_PORT ^= (1<<STATUS_PIN);
+	AddTimerTask(status, 1000, true);
 }
 
 void hello_message(void)
 {
 	usart_send_string("\r\nStarted\r\n");
-	//char tmp_string[64];
-	//itoa(*PORTD, tmp_string, 16);
-	//usart_send_string(tmp_string);
 	usart_send_string("\r\n");
 }
 
@@ -123,9 +120,14 @@ ISR(USART_RXC_vect)
 	
 	if (rx_byte == CHR_ENTER)
 	{
-		#ifdef _USART_ECHO_ENABLED
-		usart_send_char('\n');
-		#endif
+		//#ifdef _USART_ECHO_ENABLED
+		//if (echo_en)
+		//{
+			//usart_send_char('\n');
+		//}
+		
+		
+		//#endif
 		
 		AddTask(execute_command);
 	}

@@ -85,9 +85,7 @@ void light_dimmer_init(void)
 void light_update_state(void)
 {
 	
-	spi_transmit_sync(light_cur_state.byte, 2);
-	
-	//AddTimerTask(light_move, SWITCH_INTERVAL, false);	
+	spi_transmit_sync_inverted(light_cur_state.byte, 2);
 	
 }
 
@@ -97,9 +95,7 @@ void light_switch_to_next_state(void)
 	{
 		return;
 	}
-		
-	//light_cur_state.byte_l = FIFO_GET(light_lstate_queue);
-	//light_cur_state.byte_h = FIFO_GET(light_hstate_queue);
+	
 	light_cur_state.all = FIFO16_GET(light_state_queue);
 	
 	light_update_state();
@@ -113,32 +109,9 @@ void light_switch_to_next_state(void)
 
 void light_add_state_to_queue(uint8_t lamp_number, bool on)
 {
-	//uint8_t val_L = LIGHT_QUEUE_IS_EMPTY ? light_cur_state.byte_l : FIFO_PEEK_LAST(light_lstate_queue);
-	//uint8_t val_H = LIGHT_QUEUE_IS_EMPTY ? light_cur_state.byte_h : FIFO_PEEK_LAST(light_hstate_queue);
+	
 	uint16_t last_val = LIGHT_QUEUE_IS_EMPTY ? light_cur_state.all : FIFO16_PEEK_LAST(light_state_queue);
 		
-	//if (on)
-	//{
-		//if (lamp_number < 8)
-		//{
-			//sbit(val_L, lamp_number);
-		//} else if (lamp_number < 16)
-		//{
-			//sbit(val_H, (lamp_number - 8));
-		//}
-	//} else {
-		//if (lamp_number < 8)
-		//{
-			//cbit(val_L, lamp_number);
-		//} else if (lamp_number < 16)
-		//{
-			//cbit(val_H, (lamp_number - 8));
-		//}
-	//}
-	
-	//FIFO_PUT(light_lstate_queue, val_L);
-	//FIFO_PUT(light_hstate_queue, val_H);
-	
 	if (lamp_number >= LIGHT_MAIN_LAMPS_COUNT)
 	{
 		return;
@@ -172,8 +145,8 @@ void light_turn_interval(uint8_t start_bit, uint8_t stop_bit, bool on)
 		}
 	}
 	
-	//light_switch_to_next_state();
-	AddTimerTask(light_switch_to_next_state, LIGHT_SWITCH_INTERVAL_ms, true);
+	light_switch_to_next_state();
+	//AddTimerTask(light_switch_to_next_state, LIGHT_SWITCH_INTERVAL_ms, true);
 	
 }
 
