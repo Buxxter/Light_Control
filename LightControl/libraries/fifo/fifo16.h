@@ -25,9 +25,9 @@ struct {\
 #define FIFO16_SPACE(fifo)     (FIFO16_SIZE(fifo)-FIFO16_COUNT(fifo))
 
 //поместить элемент в fifo
-#define FIFO16_PUT(fifo, byte) \
+#define FIFO16_PUT(fifo, val) \
 {\
-	fifo.buf[fifo.head & (FIFO16_SIZE(fifo)-1)]=byte;\
+	fifo.buf[fifo.head & (FIFO16_SIZE(fifo)-1)]=val;\
 	fifo.head++;\
 }
 

@@ -43,6 +43,7 @@ void light_init(void);
 
 void light_add_state_to_queue(uint8_t lamp_number, bool on);
 void light_turn_interval(uint8_t start_bit, uint8_t stop_bit, bool on);
+void light_turn_interval_hard(uint8_t start_bit, uint8_t stop_bit, bool on);
 void light_get_current_state(uint8_t * output);
 
 void light_turn_all(uint8_t mode, bool on);

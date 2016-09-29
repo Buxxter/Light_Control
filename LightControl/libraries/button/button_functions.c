@@ -34,8 +34,6 @@ void button_functions_init(void)
 	intervals.erker_start	= 10;
 	intervals.erker_stop	= 13;
 }
-	
-bool buttons_override = false;
 
 void send_button_state(button *btn, char *btn_name);
 void turn(uint8_t self_start, uint8_t self_stop, bool all);

@@ -9,6 +9,4 @@ void button_functions_init(void);
 extern void (*button_func[BUTTONS_COUNT])(button *btn);
 
 
-
-
 #endif /* BUTTON_FUNCTIONS_H_ */

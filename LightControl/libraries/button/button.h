@@ -4,15 +4,17 @@
 #include "../../includes.h"
 #include "../../rtos/rtos.h"
 
-//#define BUTTON_DEBUG 0
+#define BUTTON_DEBUG 0
 
+extern bool buttons_override;
 extern uint16_t bt_mode_time;
 
 #define BUTTONS_COUNT 4
 #define BT_SCAN_INTERVAL_MS	20
+#define BT_OVERRIDE_RESET_INTERVAL_MS 10000
 
 typedef struct {
-	#ifdef BUTTON_DEBUG
+	#if (BUTTON_DEBUG)
 	char		char_index;
 	#endif
 	union {
@@ -44,6 +46,7 @@ typedef struct {
 void bt_init(void);
 void bt_scan(void);
 void bt_reset(button *btn);
+void bt_override_reset(void);
 
 uint8_t bt_run(button *btn);
 

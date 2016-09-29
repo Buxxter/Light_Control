@@ -1,10 +1,11 @@
 #include "uart_text_io.h"
 #include <util/atomic.h>
 
-uint8_t echo_en = 1;
+bool echo_en = 1;
 
 void usart_init(void)
 {
+	
 	/* Set baud rate */
 	//UBRRL = LO(bauddivider);
 	//UBRRH = HI(bauddivider) & (~(1<<URSEL));

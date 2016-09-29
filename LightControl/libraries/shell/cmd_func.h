@@ -21,9 +21,10 @@ responsibility on anything that could happen while using this code.
 #include "cmd_util.h"
 //#include "../usart/uart_text_io.h"
 #include "../../light/light.h"
+#include "../button/button.h"
 
 //Total functions number
-#define FUNC_NUM        7
+#define FUNC_NUM        8
 
 //Function and command tables
 extern void (*sys_func[FUNC_NUM])(uint8_t* p_arg[],uint8_t num_args);

@@ -3,10 +3,11 @@
 //#include "button_local.h"
 
 
-#if defined(BUTTON_DEBUG)
+#if (BUTTON_DEBUG)
 #include <stdlib.h>
 #endif
 
+bool buttons_override = false;
 
 uint16_t bt_mode_time = 2000 / 20;	// Длительность последовательности анализа
 								// Сделано переменной, а не константой
@@ -32,7 +33,7 @@ void init_button(button *btn, volatile uint8_t *pin_port, uint8_t pin, uint8_t m
 void scan_button(button *btn);
 
 
-#if defined(BUTTON_DEBUG)
+#if (BUTTON_DEBUG)
 void dbg_msg(button *btn, char *msg);
 #endif
 /* ------------------- LOCALS ------------------- */
@@ -45,9 +46,10 @@ static button buttons[BUTTONS_COUNT];
 
 void bt_init(void)
 {
+	bt_override_reset();
 	button_functions_init();
 	
-	#if defined(BUTTON_DEBUG)
+	#if (BUTTON_DEBUG)
 	buttons[0].char_index = 'D';
 	buttons[1].char_index = '2';
 	buttons[2].char_index = '3';
@@ -62,7 +64,7 @@ void bt_init(void)
 	init_button(&buttons[2], &PINA, PINC2, 1, 2);
 	init_button(&buttons[3], &PINA, PINA3, 1, 2);
 	
-	#if defined(BUTTON_DEBUG)
+	#if (BUTTON_DEBUG)
 	dbg_msg(&buttons[0], "init");
 	dbg_msg(&buttons[1], "init");
 	dbg_msg(&buttons[2], "init");
@@ -73,7 +75,7 @@ void bt_init(void)
 
 uint8_t bt_run(button *btn)
 {
-	#if defined(BUTTON_DEBUG)
+	#if (BUTTON_DEBUG)
 	dbg_msg(btn, "running");
 	#endif
 	
@@ -116,7 +118,7 @@ void bt_reset(button *btn)
 	btn->executed	= 0;
 	btn->fm_time	= 0;
 	btn->timer_value = 0;
-	#if defined(BUTTON_DEBUG)
+	#if (BUTTON_DEBUG)
 	dbg_msg(btn, "reseted");
 	#endif
 }
@@ -167,6 +169,7 @@ void bt_scan(void)
 		}
 	}
 	AddTimerTask(bt_scan, BT_SCAN_INTERVAL_MS, true);
+	
 }
 
 void scan_button(button *btn)
@@ -175,7 +178,7 @@ void scan_button(button *btn)
 	#define DN 			1
 	#define AFTER_LONG 	2
 	
-		
+	
 	switch(btn->state.fm_state)
 	{
 		case UP:
@@ -190,7 +193,7 @@ void scan_button(button *btn)
 					btn->state.processing = 1;
 					btn->timer_value = bt_mode_time;
 				}
-				#if defined(BUTTON_DEBUG)
+				#if (BUTTON_DEBUG)
 				dbg_msg(btn, "ST_UP, bt_pressed");
 				#endif
 			}
@@ -212,7 +215,7 @@ void scan_button(button *btn)
 					btn->state.fm_state = AFTER_LONG;	// Нет, уже больше! Да у нас длинное нажатие! Переходим в АЛ
 				}
 				
-				#if defined(BUTTON_DEBUG)
+				#if (BUTTON_DEBUG)
 				dbg_msg(btn, "DN, still_pressed");
 				#endif
 				
@@ -228,7 +231,7 @@ void scan_button(button *btn)
 					btn->state.processing	= 0;
 					btn->timer_value = 0;
 				}
-				#if defined(BUTTON_DEBUG)
+				#if (BUTTON_DEBUG)
 				dbg_msg(btn, "DN, released");
 				#endif
 			}
@@ -253,7 +256,7 @@ void scan_button(button *btn)
 					btn->state.processing	= 0;
 					btn->timer_value = 0;
 				}
-				#if defined(BUTTON_DEBUG)
+				#if (BUTTON_DEBUG)
 				dbg_msg(btn, "AL, released");
 				#endif
 			}
@@ -263,7 +266,13 @@ void scan_button(button *btn)
 	}
 }
 
-#if defined(BUTTON_DEBUG)
+void bt_override_reset(void)
+{
+	buttons_override = false;
+	AddTimerTask(bt_override_reset, BT_OVERRIDE_RESET_INTERVAL_MS, true);
+}
+
+#if (BUTTON_DEBUG)
 void dbg_msg(button *btn, char *msg)
 {
 	usart_send_string("btn(");

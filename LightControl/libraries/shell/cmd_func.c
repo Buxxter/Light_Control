@@ -9,12 +9,16 @@ See appropriate header file for detais.*/
 
 const uint8_t help_text[] PROGMEM = {
 "help - display this help;\r\n\
-listarg - lists its arguments;\r\n"
+light;\r\n\
+boot;\r\n\
+echo [on|off];\r\n\
+dimmer [value];\r\n\
+"
 };
 
 const uint8_t light_help[] PROGMEM = {
-"light <on/off> [start_bit] [end_bit]\r\n\
-light <hex/bin>\r\n"
+"light [hard] <on/off> [start_bit] [end_bit]\r\n\
+light <hex|bin>\r\n"
 };
 
 void print_help(uint8_t* p_arg[],uint8_t num_args)
@@ -50,6 +54,7 @@ void list_args(uint8_t* p_arg[],uint8_t num_args)
 
 const uint8_t cmd_on[] PROGMEM = {"on"};
 const uint8_t cmd_off[] PROGMEM = {"off"};
+const uint8_t cmd_hard[] PROGMEM = {"hard"};
 
 const uint8_t ledmsg_err_noparam[] PROGMEM = {"Error - too few parameters.\r\n"};
 const uint8_t msg_err_unknown[] PROGMEM = {"Error - unknown parameters.\r\n"};
@@ -141,6 +146,7 @@ void light(uint8_t * p_arg[], uint8_t num_args)
 				light_string[i] = '0' + ((light_cur_state.all & (1<<i)) != 0);
 			}
 			light_string[16] = '\0';
+			usart_send_string("0b");
 			usart_send_string(light_string);
 			new_line;
 		} else {
@@ -149,10 +155,11 @@ void light(uint8_t * p_arg[], uint8_t num_args)
 			new_line;
 		}
 	} else
-	if (num_args < 4)
+	if (num_args < 5)
 	{
+		bool hard = str_equal_pgm(p_arg[0], cmd_hard);
 		
-		if (!(str_is_number(p_arg[1])))
+		if (!(str_is_number(p_arg[hard ? 2 : 1])))
 		{
 			usart_pgm_send_string(msg_err_unknown);
 			usart_send_string((char*)p_arg[1]);
@@ -160,21 +167,30 @@ void light(uint8_t * p_arg[], uint8_t num_args)
 			return;
 		}
 		
-		if (num_args == 3)
+		if (num_args == (hard ? 4 : 3))
 		{
-			if (!(str_is_number(p_arg[2])))
+			if (!(str_is_number(p_arg[hard ? 3 : 2])))
 			{
 				usart_pgm_send_string(msg_err_unknown);
-				usart_send_string((char*)p_arg[2]);
+				usart_send_string((char*)p_arg[hard ? 3 : 2]);
 				new_line;
 				return;
 			}
 		}
 		
-		uint8_t start_bit	= str_to_uint8(p_arg[1]);
-		uint8_t end_bit		= (num_args == 3) ? str_to_uint8(p_arg[2]) : start_bit;
-		bool	tmp_on		= str_equal_pgm(p_arg[0], cmd_on);
-		light_turn_interval(start_bit, end_bit, tmp_on);		
+		if (hard)
+		{
+			bool	tmp_on		= str_equal_pgm(p_arg[1], cmd_on);
+			uint8_t start_bit	= str_to_uint8(p_arg[2]);
+			uint8_t end_bit		= (num_args == 4) ? str_to_uint8(p_arg[3]) : start_bit;
+			light_turn_interval_hard(start_bit, end_bit, tmp_on);
+		} else {
+			bool	tmp_on		= str_equal_pgm(p_arg[0], cmd_on);
+			uint8_t start_bit	= str_to_uint8(p_arg[1]);
+			uint8_t end_bit		= (num_args == 3) ? str_to_uint8(p_arg[2]) : start_bit;
+			light_turn_interval(start_bit, end_bit, tmp_on);
+		}
+				
 	}
 	
 }
@@ -224,6 +240,25 @@ void echo(uint8_t * p_arg[], uint8_t num_args)
 	
 }
 
+void bt_override(uint8_t * p_arg[], uint8_t num_args)
+{
+	if (num_args == 0)
+	{
+		usart_pgm_send_string(buttons_override ? cmd_on : cmd_off);
+		new_line;
+	} else
+	if (num_args == 1)
+	{
+		buttons_override = str_equal_pgm(p_arg[0], cmd_on);
+		AddTimerTask(bt_override_reset, 10000, true);
+	} else
+	{
+		usart_pgm_send_string(msg_err_unknown);
+		usart_send_string((char*)p_arg[0]);
+		new_line;
+	}
+}
+
 //Function table
 
 void (*sys_func[]) (uint8_t* p_arg[],uint8_t num_args) = {
@@ -234,7 +269,8 @@ void (*sys_func[]) (uint8_t* p_arg[],uint8_t num_args) = {
 	light,
 	dimmer,
 	boot,
-	echo
+	echo,
+	bt_override
 
 };
 
@@ -247,6 +283,7 @@ const uint8_t funcname4[] PROGMEM = {"light"};
 const uint8_t funcname5[] PROGMEM = {"dimmer"};
 const uint8_t funcname6[] PROGMEM = {"boot"};
 const uint8_t funcname7[] PROGMEM = {"echo"};
+const uint8_t funcname8[] PROGMEM = {"bt_override"};
 
 const uint8_t * const sys_func_names[] PROGMEM = {
 
@@ -256,5 +293,6 @@ const uint8_t * const sys_func_names[] PROGMEM = {
 	funcname4,
 	funcname5,
 	funcname6,
-	funcname7
+	funcname7,
+	funcname8
 };

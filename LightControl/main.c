@@ -56,10 +56,10 @@ void init(void)
 	
 	light_init();
 	usart_init();
-	rtos_init();
-	hello_message();
-	
+	rtos_init();	
 	bt_init();
+	bt_scan();
+	hello_message();
 	
 	wdt_init();
 }
@@ -91,7 +91,14 @@ void execute_command(void)
 		
 	uint8_t result = cmd_exec(command);
 	
-	usart_pgm_send_string(result ? pgm_ok : pgm_error);
+	if (result && echo_en)
+	{
+		usart_pgm_send_string(pgm_ok);
+	} else
+	if (!result)
+	{
+		usart_pgm_send_string(pgm_error);
+	}
 	
 }
 

@@ -130,6 +130,7 @@ void light_add_state_to_queue(uint8_t lamp_number, bool on)
 		
 }
 
+
 void light_turn_interval(uint8_t start_bit, uint8_t stop_bit, bool on)
 {
 	if (start_bit <= stop_bit)
@@ -148,6 +149,30 @@ void light_turn_interval(uint8_t start_bit, uint8_t stop_bit, bool on)
 	light_switch_to_next_state();
 	//AddTimerTask(light_switch_to_next_state, LIGHT_SWITCH_INTERVAL_ms, true);
 	
+}
+
+void light_turn_interval_hard(uint8_t start_bit, uint8_t stop_bit, bool on)
+{
+	uint16_t last_val = LIGHT_QUEUE_IS_EMPTY ? light_cur_state.all : FIFO16_PEEK_LAST(light_state_queue);
+	uint16_t new_part = 0;
+	
+	for (uint16_t i = 0; i <= (start_bit <= stop_bit ? stop_bit - start_bit : start_bit - stop_bit); i++)
+	{
+		new_part |= (1 << i);
+	}
+	
+	new_part = (new_part << (start_bit <= stop_bit ? start_bit : stop_bit));
+	
+	if (on)
+	{
+		last_val |= new_part;
+	} else {
+		last_val &= ~(new_part);
+	}
+	
+	FIFO16_PUT(light_state_queue, last_val);
+	light_switch_to_next_state();
+		
 }
 
 void light_get_current_state(uint8_t * output)

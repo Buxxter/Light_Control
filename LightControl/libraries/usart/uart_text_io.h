@@ -14,6 +14,7 @@ responsibility on anything that could happen while using this code.
 #include <avr/io.h>
 #include <stdint.h>
 #include <avr/pgmspace.h>
+#include <stdbool.h>
 
 
 #include "../hardware.h"
@@ -23,8 +24,8 @@ responsibility on anything that could happen while using this code.
 
 #include "../fifo/fifo.h"
 #define _USART_FIFO_ENABLED
-//#define _USART_ECHO_ENABLED
-extern uint8_t echo_en;
+
+extern bool echo_en;
 
 
 //Maximum input text length
