@@ -1,4 +1,5 @@
 #include "cmd_util.h"
+#include "../macros.h"
 #include <stdbool.h>
 
 /*Code module from AVR command shell project.
@@ -6,7 +7,7 @@ See appropriate header file for detais.*/
 
 uint8_t is_regular_char(char x)
 {
-    if (((x>='A') && (x<='Z')) || ((x>='a') && (x<='z')) || ((x>='0') && (x<='9')))
+    if (((x>='A') && (x<='Z')) || ((x>='a') && (x<='z')) || ((x>='0') && (x<='9')) || x == '|' || x == '&')
         return 1;
     else
         return 0;
@@ -104,4 +105,21 @@ bool str_is_number(uint8_t *str)
 	}
 	
 	return true;	
+}
+
+
+uint16_t str_to_b_uint16(uint8_t *str)
+{
+	uint16_t result = 0;
+	if (16 == str_len(str))
+	{
+		for (uint8_t i = 0; i < 16; i++)
+		{
+			if (str[i] == '1')
+			{
+				sbit(result, i);
+			}
+		}
+	}
+	return result;
 }

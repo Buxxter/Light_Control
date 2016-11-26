@@ -107,10 +107,21 @@ void light_switch_to_next_state(void)
 	
 }
 
-void light_add_state_to_queue(uint8_t lamp_number, bool on)
+uint16_t light_get_last_state_uint16(void)
+{
+	return (LIGHT_QUEUE_IS_EMPTY ? light_cur_state.all : FIFO16_PEEK_LAST(light_state_queue));
+}
+
+void light_set_state_uint16(uint16_t new_value)
+{
+	FIFO16_PUT(light_state_queue, new_value);
+	light_switch_to_next_state();
+}
+
+void light_add_state_to_queue_by_lamp_number(uint8_t lamp_number, bool on)
 {
 	
-	uint16_t last_val = LIGHT_QUEUE_IS_EMPTY ? light_cur_state.all : FIFO16_PEEK_LAST(light_state_queue);
+	uint16_t last_val = light_get_last_state_uint16();
 		
 	if (lamp_number >= LIGHT_MAIN_LAMPS_COUNT)
 	{
@@ -126,9 +137,9 @@ void light_add_state_to_queue(uint8_t lamp_number, bool on)
 		cbit(last_val, lamp_number);
 	}
 	FIFO16_PUT(light_state_queue, last_val);
-		
-		
+	
 }
+
 
 
 void light_turn_interval(uint8_t start_bit, uint8_t stop_bit, bool on)
@@ -137,12 +148,12 @@ void light_turn_interval(uint8_t start_bit, uint8_t stop_bit, bool on)
 	{
 		for (uint8_t i = 0 ; i <= stop_bit - start_bit; i++)
 		{
-			light_add_state_to_queue(start_bit + i, on);
+			light_add_state_to_queue_by_lamp_number(start_bit + i, on);
 		}
 	} else {
 		for (uint8_t i = 0 ; i <= start_bit - stop_bit; i++)
 		{
-			light_add_state_to_queue(start_bit - i, on);
+			light_add_state_to_queue_by_lamp_number(start_bit - i, on);
 		}
 	}
 	
@@ -175,7 +186,7 @@ void light_turn_interval_hard(uint8_t start_bit, uint8_t stop_bit, bool on)
 		
 }
 
-void light_get_current_state(uint8_t * output)
+void light_get_current_state_uint8(uint8_t * output)
 {
 	//spi_transfer_sync(light_cur_state.byte, output, 2);
 	//spi_transmit_sync(output, 2);
@@ -215,7 +226,7 @@ void light_turn_all(uint8_t mode, bool on)
 	
 	while(iter < LIGHT_MAIN_LAMPS_COUNT)
 	{
-		light_add_state_to_queue(iter, on);
+		light_add_state_to_queue_by_lamp_number(iter, on);
 		iter = iter + step;
 	}
 	

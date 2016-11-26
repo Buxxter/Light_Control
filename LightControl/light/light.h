@@ -41,10 +41,12 @@ light_state light_cur_state;
 void light_init(void);
 
 
-void light_add_state_to_queue(uint8_t lamp_number, bool on);
+void light_add_state_to_queue_by_lamp_number(uint8_t lamp_number, bool on);
 void light_turn_interval(uint8_t start_bit, uint8_t stop_bit, bool on);
 void light_turn_interval_hard(uint8_t start_bit, uint8_t stop_bit, bool on);
-void light_get_current_state(uint8_t * output);
+void light_get_current_state_uint8(uint8_t * output);
+uint16_t light_get_last_state_uint16(void);
+void light_set_state_uint16(uint16_t new_value);
 
 void light_turn_all(uint8_t mode, bool on);
 

@@ -1,5 +1,6 @@
 #include "cmd_func.h"
 
+
 /*Code module from AVR command shell project.
 See appropriate header file for detais.*/
 
@@ -61,9 +62,44 @@ const uint8_t msg_err_unknown[] PROGMEM = {"Error - unknown parameters.\r\n"};
 	
 const uint8_t msg_hex[] PROGMEM = {"hex"};
 const uint8_t msg_bin[] PROGMEM = {"bin"};
-
+const uint8_t msg_and[] PROGMEM = {"&"};
+const uint8_t msg_or[] PROGMEM	= {"|"};
 
 volatile uint8_t ledtype;
+
+#ifndef _LOCAL_FUNCTIONS
+
+// Headers
+
+void send_light_state_bin(void);
+void send_light_state_hex(void);
+
+
+// Implementations
+
+void send_light_state_bin(void)
+{
+	char light_string[17];
+	for (uint8_t i = 0; i < 16; i++)
+	{
+		light_string[i] = '0' + ((light_cur_state.all & (1<<i)) != 0);
+	}
+	light_string[16] = '\0';
+	usart_send_string("0b");
+	usart_send_string(light_string);
+	new_line;
+}
+
+void send_light_state_hex(void)
+{
+	uint8_t light_state[3];
+	light_get_current_state_uint8(light_state);
+	light_state[2] = '\0';
+	usart_send_string((char*)light_state);
+	new_line;
+}
+
+#endif
 
 void handle_led(uint8_t* p_arg[],uint8_t num_args)
 {
@@ -127,36 +163,33 @@ void light(uint8_t * p_arg[], uint8_t num_args)
 	if (num_args == 0)
 	{
 		usart_pgm_send_string(light_help);
-	} else
-	if (num_args == 1)
-	{
+	} else if (num_args == 1) {
 		if (str_equal_pgm(p_arg[0], msg_hex))
 		{
-			uint8_t light_state[3];
-			light_get_current_state(light_state);
-			light_state[2] = '\0';
-			usart_send_string((char*)light_state);
-			new_line;
-		} else
-		if (str_equal_pgm(p_arg[0], msg_bin))
-		{
-			char light_string[17];
-			for (uint8_t i = 0; i < 16; i++)
-			{
-				light_string[i] = '0' + ((light_cur_state.all & (1<<i)) != 0);
-			}
-			light_string[16] = '\0';
-			usart_send_string("0b");
-			usart_send_string(light_string);
-			new_line;
+			send_light_state_hex();
+		} else if (str_equal_pgm(p_arg[0], msg_bin)) {
+			send_light_state_bin();
 		} else {
 			usart_pgm_send_string(msg_err_unknown);
 			usart_send_string((char*)p_arg[0]);
 			new_line;
 		}
-	} else
-	if (num_args < 5)
+	} else if ((2 == num_args) && (('|' == p_arg[0][0]) || ('&' == p_arg[0][0])))
 	{
+		uint16_t last_light_state = light_get_last_state_uint16();	
+		uint16_t new_value = str_to_b_uint16(p_arg[1]);
+		
+		if ('|' == p_arg[0][0])
+		{
+			new_value |= last_light_state;
+		} else {
+			new_value &= last_light_state;
+		}
+				
+		light_set_state_uint16(new_value);
+		send_light_state_bin();
+		
+	} else if (num_args < 5) {
 		bool hard = str_equal_pgm(p_arg[0], cmd_hard);
 		
 		if (!(str_is_number(p_arg[hard ? 2 : 1])))
@@ -249,8 +282,8 @@ void bt_override(uint8_t * p_arg[], uint8_t num_args)
 	} else
 	if (num_args == 1)
 	{
-		buttons_override = str_equal_pgm(p_arg[0], cmd_on);
 		AddTimerTask(bt_override_reset, 10000, true);
+		buttons_override = str_equal_pgm(p_arg[0], cmd_on);
 	} else
 	{
 		usart_pgm_send_string(msg_err_unknown);
